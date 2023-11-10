@@ -12,6 +12,7 @@ class _WelcomeBackState extends State<WelcomeBack> {
   // define variables for the login screen
   String emailAddress = '';
   String password = '';
+  bool _hidePassword = true;
 
   // validate the login form
   bool _validateForm() {
@@ -30,24 +31,21 @@ class _WelcomeBackState extends State<WelcomeBack> {
     }
   }
 
+  void toggleEye() {
+    setState(() {
+      _hidePassword = !_hidePassword;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: Container(
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            colors: [
-              Colors.black,
-              Colors.black45,
-            ],
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-          ),
-        ),
+        color: Color(0xff171b29),
         child: Padding(
           padding: const EdgeInsets.all(16.0),
           child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               // Welcome Back text
@@ -64,44 +62,52 @@ class _WelcomeBackState extends State<WelcomeBack> {
               ),
 
               // Email address field
-              TextField(
-                style: TextStyle(height: 2),
-                decoration: InputDecoration(
-                  labelText: 'Email Address',
-                  labelStyle: TextStyle(color: Colors.white54),
-                  focusedBorder: UnderlineInputBorder(
-                    borderSide: BorderSide(color: Colors.black),
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: TextFormField(
+                  style: TextStyle(color: Colors.white),
+                  keyboardType: TextInputType.emailAddress,
+                  decoration: InputDecoration(
+                    filled: true,
+                    fillColor: Colors.blueGrey[300],
+                    icon: Icon(Icons.alternate_email),
+                    labelText: 'Email Address',
+                    labelStyle: TextStyle(color: Colors.white54),
                   ),
-                  border: OutlineInputBorder(
-                    borderSide: BorderSide(color: Colors.black, width: 1),
-                  ),
+                  onChanged: (value) {
+                    emailAddress = value;
+                  },
                 ),
-                onChanged: (value) {
-                  emailAddress = value;
-                },
               ),
 
               // Password field
-              TextField(
-                style: TextStyle(height: 2),
-                decoration: InputDecoration(
-                  labelText: 'Password',
-                  labelStyle: TextStyle(color: Colors.white54),
-                  focusedBorder: UnderlineInputBorder(
-                    borderSide: BorderSide(color: Colors.black),
-                  ),
-                  border: OutlineInputBorder(
-                    borderSide: BorderSide(color: Colors.black, width: 1),
-                  ),
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: TextFormField(
+                  style: TextStyle(color: Colors.white),
+                  decoration: InputDecoration(
+                      filled: true,
+                      fillColor: Colors.blueGrey[300],
+                      icon: Icon(Icons.lock),
+                      labelText: 'Password',
+                      labelStyle: TextStyle(color: Colors.white),
+                      suffixIcon: GestureDetector(
+                        onTap: toggleEye,
+                        child: _hidePassword
+                            ? Icon(Icons.visibility_off_rounded)
+                            : Icon(Icons.visibility_rounded),
+                      ),
+                      suffixIconColor: Colors.grey),
+                  obscureText: _hidePassword,
+                  onChanged: (value) {
+                    password = value;
+                  },
                 ),
-                obscureText: true,
-                onChanged: (value) {
-                  password = value;
-                },
               ),
 
               // Forgot password button
               TextButton(
+                style: ButtonStyle(alignment: Alignment.centerRight),
                 onPressed: () {},
                 child: Text(
                   'Forgot Password?',
@@ -110,16 +116,16 @@ class _WelcomeBackState extends State<WelcomeBack> {
               ),
 
               // Login button
-              SizedBox(
-                width: double.infinity,
-                child: ElevatedButton(
-                  onPressed: _submitForm,
+              ElevatedButton(
+                onPressed: _submitForm,
+                child: Padding(
+                  padding: const EdgeInsets.all(20.0),
                   child: Text('Log In', style: TextStyle(color: Colors.black)),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.yellowAccent,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(10.0),
-                    ),
+                ),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Color(0xffdbba5e),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10.0),
                   ),
                 ),
               ),
