@@ -1,18 +1,25 @@
 // ignore_for_file: prefer_const_constructors
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import '../Providers/Theme_Provider.dart';
 
 class WelcomeBack extends StatefulWidget {
   const WelcomeBack({super.key});
 
   @override
-  _WelcomeBackState createState() => _WelcomeBackState();
+  State<WelcomeBack> createState() => _WelcomeBackState();
 }
 
 class _WelcomeBackState extends State<WelcomeBack> {
   // define variables for the login screen
   String emailAddress = '';
   String password = '';
+
   bool _hidePassword = true;
+
+  final formkey = GlobalKey<FormState>();
+  final emailController = TextEditingController();
+  final passwordController = TextEditingController();
 
   // validate the login form
   bool _validateForm() {
@@ -39,95 +46,98 @@ class _WelcomeBackState extends State<WelcomeBack> {
 
   @override
   Widget build(BuildContext context) {
+    bool isDark = Provider.of<ThemeProvider>(context, listen: true).isDarkMode;
     return Scaffold(
-      body: Container(
-        color: Color(0xff171b29),
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
+      appBar: AppBar(
+        title: Text('H'),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.brightness_4),
+            onPressed: () {
+              Provider.of<ThemeProvider>(context, listen: false).toggleTheme();
+            },
+          ),
+        ],
+      ),
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Form(
+          key: formkey,
           child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
             mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              // Welcome Back text
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Text(
-                  'Welcome Back!',
-                  style: TextStyle(
-                    fontSize: 32.0,
+              Text(
+                'WelcomeBack!',
+                style: TextStyle(
+                    fontSize: 30,
                     fontWeight: FontWeight.bold,
-                    color: Colors.white,
-                  ),
-                ),
+                    color: isDark ? Colors.white : Colors.black),
               ),
-
-              // Email address field
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: TextFormField(
-                  style: TextStyle(color: Colors.white),
-                  keyboardType: TextInputType.emailAddress,
-                  decoration: InputDecoration(
+              SizedBox(
+                height: 10,
+              ),
+              TextFormField(
+                key: const Key('Email'),
+                controller: emailController,
+                style: TextStyle(color: Colors.white),
+                keyboardType: TextInputType.emailAddress,
+                decoration: InputDecoration(
+                  filled: true,
+                  fillColor: Colors.blueGrey[800],
+                  icon: Icon(Icons.alternate_email),
+                  labelText: 'Email Address',
+                  labelStyle: TextStyle(color: Colors.white54),
+                ),
+                onChanged: (value) {
+                  emailAddress = value;
+                },
+              ),
+              TextFormField(
+                key: const Key('Password'),
+                controller: passwordController,
+                style: TextStyle(color: Colors.white),
+                decoration: InputDecoration(
                     filled: true,
-                    fillColor: Colors.blueGrey[300],
-                    icon: Icon(Icons.alternate_email),
-                    labelText: 'Email Address',
-                    labelStyle: TextStyle(color: Colors.white54),
-                  ),
-                  onChanged: (value) {
-                    emailAddress = value;
-                  },
-                ),
+                    fillColor: Colors.blueGrey[800],
+                    icon: Icon(Icons.lock),
+                    labelText: 'Password',
+                    labelStyle: TextStyle(color: Colors.white),
+                    suffixIcon: GestureDetector(
+                      onTap: toggleEye,
+                      child: _hidePassword
+                          ? Icon(Icons.visibility_off_rounded)
+                          : Icon(Icons.visibility_rounded),
+                    ),
+                    suffixIconColor: Colors.grey),
+                obscureText: _hidePassword,
+                onChanged: (value) {
+                  password = value;
+                },
               ),
-
-              // Password field
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: TextFormField(
-                  style: TextStyle(color: Colors.white),
-                  decoration: InputDecoration(
-                      filled: true,
-                      fillColor: Colors.blueGrey[300],
-                      icon: Icon(Icons.lock),
-                      labelText: 'Password',
-                      labelStyle: TextStyle(color: Colors.white),
-                      suffixIcon: GestureDetector(
-                        onTap: toggleEye,
-                        child: _hidePassword
-                            ? Icon(Icons.visibility_off_rounded)
-                            : Icon(Icons.visibility_rounded),
-                      ),
-                      suffixIconColor: Colors.grey),
-                  obscureText: _hidePassword,
-                  onChanged: (value) {
-                    password = value;
-                  },
-                ),
+              SizedBox(
+                height: 10,
               ),
-
-              // Forgot password button
               TextButton(
+                key: const Key('Forgot'),
                 style: ButtonStyle(alignment: Alignment.centerRight),
                 onPressed: () {},
                 child: Text(
                   'Forgot Password?',
-                  style: TextStyle(color: Colors.white),
+                  style: TextStyle(color: isDark ? Colors.white : Colors.black),
                 ),
               ),
-
-              // Login button
               ElevatedButton(
+                key: const Key('Login'),
                 onPressed: _submitForm,
-                child: Padding(
-                  padding: const EdgeInsets.all(20.0),
-                  child: Text('Log In', style: TextStyle(color: Colors.black)),
-                ),
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: Color(0xffdbba5e),
+                  backgroundColor: const Color(0xffdbba5e),
                   shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(10.0),
+                    borderRadius: BorderRadius.circular(5.0),
                   ),
+                  padding: const EdgeInsets.all(20.0),
                 ),
+                child: Text('Log In', style: TextStyle(color: Colors.black)),
               ),
             ],
           ),
