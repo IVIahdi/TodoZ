@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "562891858605",
+    "project_id": "todoz-d4cf7",
+    "storage_bucket": "todoz-d4cf7.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:562891858605:android:6e5401870178b85b19dc24",
+        "android_client_info": {
+          "package_name": "com.example.listify"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBXVueYbdcLhJ8JbI9X5C8u3gjFBf_MNjM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
