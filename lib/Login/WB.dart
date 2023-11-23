@@ -15,6 +15,8 @@ class _WelcomeBackState extends State<WelcomeBack> {
   String emailAddress = '';
   String password = '';
 
+  bool loginMode = true;
+
   bool _hidePassword = true;
 
   final formkey = GlobalKey<FormState>();
@@ -32,16 +34,15 @@ class _WelcomeBackState extends State<WelcomeBack> {
   // submit the login form
   void _submitForm() {
     if (_validateForm()) {
-      // TODO: Implement login logic
-    } else {
-      // Show error message
-    }
+    } else {}
   }
 
   void toggleEye() {
-    setState(() {
-      _hidePassword = !_hidePassword;
-    });
+    setState(
+      () {
+        _hidePassword = !_hidePassword;
+      },
+    );
   }
 
   @override
@@ -49,7 +50,7 @@ class _WelcomeBackState extends State<WelcomeBack> {
     bool isDark = Provider.of<ThemeProvider>(context, listen: true).isDarkMode;
     return Scaffold(
       appBar: AppBar(
-        title: Text('H'),
+        title: Text('IVI'),
         actions: [
           IconButton(
             icon: const Icon(Icons.brightness_4),
@@ -68,11 +69,11 @@ class _WelcomeBackState extends State<WelcomeBack> {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               Text(
-                'WelcomeBack!',
+                'Welcome Back!',
                 style: TextStyle(
-                    fontSize: 30,
-                    fontWeight: FontWeight.bold,
-                    color: isDark ? Colors.white : Colors.black),
+                  fontSize: 30,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
               SizedBox(
                 height: 10,
@@ -83,11 +84,8 @@ class _WelcomeBackState extends State<WelcomeBack> {
                 style: TextStyle(color: Colors.white),
                 keyboardType: TextInputType.emailAddress,
                 decoration: InputDecoration(
-                  filled: true,
-                  fillColor: Colors.blueGrey[800],
                   icon: Icon(Icons.alternate_email),
                   labelText: 'Email Address',
-                  labelStyle: TextStyle(color: Colors.white54),
                 ),
                 onChanged: (value) {
                   emailAddress = value;
@@ -98,11 +96,8 @@ class _WelcomeBackState extends State<WelcomeBack> {
                 controller: passwordController,
                 style: TextStyle(color: Colors.white),
                 decoration: InputDecoration(
-                    filled: true,
-                    fillColor: Colors.blueGrey[800],
                     icon: Icon(Icons.lock),
                     labelText: 'Password',
-                    labelStyle: TextStyle(color: Colors.white),
                     suffixIcon: GestureDetector(
                       onTap: toggleEye,
                       child: _hidePassword
@@ -118,13 +113,17 @@ class _WelcomeBackState extends State<WelcomeBack> {
               SizedBox(
                 height: 10,
               ),
-              TextButton(
-                key: const Key('Forgot'),
-                style: ButtonStyle(alignment: Alignment.centerRight),
-                onPressed: () {},
-                child: Text(
-                  'Forgot Password?',
-                  style: TextStyle(color: isDark ? Colors.white : Colors.black),
+              Visibility(
+                visible: loginMode,
+                child: TextButton(
+                  key: const Key('Forgot'),
+                  style: ButtonStyle(alignment: Alignment.centerRight),
+                  onPressed: () {},
+                  child: Text(
+                    'Forgot Password?',
+                    style:
+                        TextStyle(color: isDark ? Colors.white : Colors.black),
+                  ),
                 ),
               ),
               ElevatedButton(
@@ -137,8 +136,24 @@ class _WelcomeBackState extends State<WelcomeBack> {
                   ),
                   padding: const EdgeInsets.all(20.0),
                 ),
-                child: Text('Log In', style: TextStyle(color: Colors.black)),
+                child: Text(loginMode ? 'Log In' : 'Sing Up',
+                    style: TextStyle(color: Colors.black)),
               ),
+              Padding(
+                padding: const EdgeInsets.all(12.0),
+                child: Center(
+                  child: GestureDetector(
+                    onTap: () {
+                      setState(() {
+                        loginMode = !loginMode;
+                      });
+                    },
+                    child: Text(loginMode
+                        ? 'Don\'t have an account? Register here'
+                        : 'Already registered? Login here'),
+                  ),
+                ),
+              )
             ],
           ),
         ),
