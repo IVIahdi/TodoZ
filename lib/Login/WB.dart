@@ -81,7 +81,6 @@ class _WelcomeBackState extends State<WelcomeBack> {
               TextFormField(
                 key: const Key('Email'),
                 controller: emailController,
-                style: TextStyle(color: Colors.white),
                 keyboardType: TextInputType.emailAddress,
                 decoration: InputDecoration(
                   icon: Icon(Icons.alternate_email),
@@ -94,7 +93,6 @@ class _WelcomeBackState extends State<WelcomeBack> {
               TextFormField(
                 key: const Key('Password'),
                 controller: passwordController,
-                style: TextStyle(color: Colors.white),
                 decoration: InputDecoration(
                     icon: Icon(Icons.lock),
                     labelText: 'Password',

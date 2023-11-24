@@ -4,21 +4,14 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'Login/WB.dart';
 import 'Providers/Theme_Provider.dart';
+import 'firebase_options.dart';
 
-Future main() async {
+Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  if (kIsWeb) {
-    await Firebase.initializeApp(
-      options: const FirebaseOptions(
-          apiKey: "AIzaSyDQPWAPr-S8yHLtIRN6AryveH5ln9hZMcE",
-          appId: "1:562891858605:web:30946af5214569d119dc24",
-          messagingSenderId: "562891858605",
-          projectId: "todoz-d4cf7"),
-    );
-  } else {
-    await Firebase.initializeApp();
-  }
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
 
   runApp(
     ChangeNotifierProvider(
