@@ -1,4 +1,5 @@
 // ignore_for_file: prefer_const_constructors
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../Providers/Theme_Provider.dart';
@@ -11,9 +12,7 @@ class WelcomeBack extends StatefulWidget {
 }
 
 class _WelcomeBackState extends State<WelcomeBack> {
-  // define variables for the login screen
-  String emailAddress = '';
-  String password = '';
+  final _auth = FirebaseAuth.instance;
 
   bool loginMode = true;
 
@@ -23,18 +22,58 @@ class _WelcomeBackState extends State<WelcomeBack> {
   final emailController = TextEditingController();
   final passwordController = TextEditingController();
 
-  // validate the login form
   bool _validateForm() {
-    if (emailAddress.isEmpty || password.isEmpty) {
+    if (emailController.text.isEmpty || passwordController.text.isEmpty) {
       return false;
     }
     return true;
   }
 
-  // submit the login form
-  void _submitForm() {
-    if (_validateForm()) {
-    } else {}
+  // Function to show an error Snackbar
+  void _showErrorSnackbar(String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(message),
+        duration: Duration(seconds: 3),
+        action: SnackBarAction(
+          label: 'Dismiss',
+          onPressed: () {
+            ScaffoldMessenger.of(context).hideCurrentSnackBar();
+          },
+        ),
+      ),
+    );
+  }
+
+  void _submitForm() async {
+    try {
+      if (!loginMode && _validateForm()) {
+        var _user = await _auth.createUserWithEmailAndPassword(
+          email: emailController.text,
+          password: passwordController.text,
+        );
+        // Registration successful, you can navigate to another screen or perform other actions
+      } else if (loginMode && _validateForm()) {
+        var _user = await _auth.signInWithEmailAndPassword(
+          email: emailController.text,
+          password: passwordController.text,
+        );
+        // Login successful, you can navigate to another screen or perform other actions
+      } else {
+        throw Exception('Invalid form data');
+      }
+    } on FirebaseAuthException catch (e) {
+      if (e.code == 'email-already-in-use') {
+        _showErrorSnackbar('The email address is already registered.');
+      } else {
+        _showErrorSnackbar(
+            'Authentication failed. Please check your credentials.');
+      }
+    } catch (e) {
+      // Handle other exceptions
+      _showErrorSnackbar(
+          'Authentication failed. Please check your credentials.');
+    }
   }
 
   void toggleEye() {
@@ -79,18 +118,23 @@ class _WelcomeBackState extends State<WelcomeBack> {
                 height: 10,
               ),
               TextFormField(
+                autovalidateMode: AutovalidateMode.onUserInteraction,
                 key: const Key('Email'),
                 controller: emailController,
-                keyboardType: TextInputType.emailAddress,
                 decoration: InputDecoration(
                   icon: Icon(Icons.alternate_email),
                   labelText: 'Email Address',
                 ),
-                onChanged: (value) {
-                  emailAddress = value;
+                onChanged: (value) {},
+                validator: (value) {
+                  if (value == null || !value.contains('@')) {
+                    return 'Invalid email';
+                  }
+                  return null;
                 },
               ),
               TextFormField(
+                autovalidateMode: AutovalidateMode.onUserInteraction,
                 key: const Key('Password'),
                 controller: passwordController,
                 decoration: InputDecoration(
@@ -104,8 +148,12 @@ class _WelcomeBackState extends State<WelcomeBack> {
                     ),
                     suffixIconColor: Colors.grey),
                 obscureText: _hidePassword,
-                onChanged: (value) {
-                  password = value;
+                onChanged: (value) {},
+                validator: (value) {
+                  if (value == null || value.length < 8) {
+                    return 'Password must be at least 8 characters';
+                  }
+                  return null;
                 },
               ),
               SizedBox(
