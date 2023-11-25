@@ -1,6 +1,8 @@
 // ignore_for_file: prefer_const_constructors
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:listify/Pages/HomePage.dart';
 import 'package:provider/provider.dart';
 import '../Providers/Theme_Provider.dart';
 
@@ -21,12 +23,13 @@ class _WelcomeBackState extends State<WelcomeBack> {
   final formkey = GlobalKey<FormState>();
   final emailController = TextEditingController();
   final passwordController = TextEditingController();
+  final usernameController = TextEditingController();
 
   bool _validateForm() {
-    if (emailController.text.isEmpty || passwordController.text.isEmpty) {
-      return false;
+    if (formkey.currentState!.validate()) {
+      return true;
     }
-    return true;
+    return false;
   }
 
   // Function to show an error Snackbar
@@ -35,12 +38,6 @@ class _WelcomeBackState extends State<WelcomeBack> {
       SnackBar(
         content: Text(message),
         duration: Duration(seconds: 3),
-        action: SnackBarAction(
-          label: 'Dismiss',
-          onPressed: () {
-            ScaffoldMessenger.of(context).hideCurrentSnackBar();
-          },
-        ),
       ),
     );
   }
@@ -52,13 +49,51 @@ class _WelcomeBackState extends State<WelcomeBack> {
           email: emailController.text,
           password: passwordController.text,
         );
-        // Registration successful, you can navigate to another screen or perform other actions
+        await FirebaseFirestore.instance
+            .collection('users')
+            .doc(_user.user!.uid)
+            .set(
+          {
+            'email': emailController.text,
+            'username': usernameController.text,
+          },
+        );
+        var userData = await FirebaseFirestore.instance
+            .collection('users')
+            .doc(_user.user!.uid)
+            .get();
+
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+            builder: (context) => HomePage(
+              user: _user,
+              userData: userData.data(),
+            ),
+          ),
+        );
       } else if (loginMode && _validateForm()) {
         var _user = await _auth.signInWithEmailAndPassword(
           email: emailController.text,
           password: passwordController.text,
         );
-        // Login successful, you can navigate to another screen or perform other actions
+
+        // Fetch the user data from Firestore
+        var userData = await FirebaseFirestore.instance
+            .collection('users')
+            .doc(_user.user!.uid)
+            .get();
+
+        // Navigate to HomePage with the UserCredential and additional user data
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+            builder: (context) => HomePage(
+              user: _user,
+              userData: userData.data(),
+            ),
+          ),
+        );
       } else {
         throw Exception('Invalid form data');
       }
@@ -67,12 +102,10 @@ class _WelcomeBackState extends State<WelcomeBack> {
         _showErrorSnackbar('The email address is already registered.');
       } else {
         _showErrorSnackbar(
-            'Authentication failed. Please check your credentials.');
+            'Failed (User Side). Please check your credentials.');
       }
     } catch (e) {
-      // Handle other exceptions
-      _showErrorSnackbar(
-          'Authentication failed. Please check your credentials.');
+      _showErrorSnackbar('Failed (Server Side).');
     }
   }
 
@@ -103,104 +136,115 @@ class _WelcomeBackState extends State<WelcomeBack> {
         padding: const EdgeInsets.all(16.0),
         child: Form(
           key: formkey,
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              Text(
-                'Welcome Back!',
-                style: TextStyle(
-                  fontSize: 30,
-                  fontWeight: FontWeight.bold,
+          child: SingleChildScrollView(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                Text(
+                  'Welcome Back!',
+                  style: TextStyle(
+                    fontSize: 30,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
-              ),
-              SizedBox(
-                height: 10,
-              ),
-              TextFormField(
-                autovalidateMode: AutovalidateMode.onUserInteraction,
-                key: const Key('Email'),
-                controller: emailController,
-                decoration: InputDecoration(
-                  icon: Icon(Icons.alternate_email),
-                  labelText: 'Email Address',
+                SizedBox(
+                  height: 10,
                 ),
-                onChanged: (value) {},
-                validator: (value) {
-                  if (value == null || !value.contains('@')) {
-                    return 'Invalid email';
-                  }
-                  return null;
-                },
-              ),
-              TextFormField(
-                autovalidateMode: AutovalidateMode.onUserInteraction,
-                key: const Key('Password'),
-                controller: passwordController,
-                decoration: InputDecoration(
-                    icon: Icon(Icons.lock),
-                    labelText: 'Password',
-                    suffixIcon: GestureDetector(
-                      onTap: toggleEye,
-                      child: _hidePassword
-                          ? Icon(Icons.visibility_off_rounded)
-                          : Icon(Icons.visibility_rounded),
+                Visibility(
+                  visible: !loginMode,
+                  child: TextFormField(
+                    key: const Key('Username'),
+                    controller: usernameController,
+                    decoration: InputDecoration(
+                      icon: Icon(Icons.person),
+                      labelText: 'Username',
                     ),
-                    suffixIconColor: Colors.grey),
-                obscureText: _hidePassword,
-                onChanged: (value) {},
-                validator: (value) {
-                  if (value == null || value.length < 8) {
-                    return 'Password must be at least 8 characters';
-                  }
-                  return null;
-                },
-              ),
-              SizedBox(
-                height: 10,
-              ),
-              Visibility(
-                visible: loginMode,
-                child: TextButton(
-                  key: const Key('Forgot'),
-                  style: ButtonStyle(alignment: Alignment.centerRight),
-                  onPressed: () {},
-                  child: Text(
-                    'Forgot Password?',
-                    style:
-                        TextStyle(color: isDark ? Colors.white : Colors.black),
                   ),
                 ),
-              ),
-              ElevatedButton(
-                key: const Key('Login'),
-                onPressed: _submitForm,
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xffdbba5e),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(5.0),
+                TextFormField(
+                  key: const Key('Email'),
+                  controller: emailController,
+                  decoration: InputDecoration(
+                    icon: Icon(Icons.alternate_email),
+                    labelText: 'Email Address',
                   ),
-                  padding: const EdgeInsets.all(20.0),
+                  onChanged: (value) {},
+                  validator: (value) {
+                    if (value == null || !value.contains('@')) {
+                      return 'Invalid email';
+                    }
+                    return null;
+                  },
                 ),
-                child: Text(loginMode ? 'Log In' : 'Sing Up',
-                    style: TextStyle(color: Colors.black)),
-              ),
-              Padding(
-                padding: const EdgeInsets.all(12.0),
-                child: Center(
-                  child: GestureDetector(
-                    onTap: () {
-                      setState(() {
-                        loginMode = !loginMode;
-                      });
-                    },
-                    child: Text(loginMode
-                        ? 'Don\'t have an account? Register here'
-                        : 'Already registered? Login here'),
+                TextFormField(
+                  key: const Key('Password'),
+                  controller: passwordController,
+                  decoration: InputDecoration(
+                      icon: Icon(Icons.lock),
+                      labelText: 'Password',
+                      suffixIcon: GestureDetector(
+                        onTap: toggleEye,
+                        child: _hidePassword
+                            ? Icon(Icons.visibility_off_rounded)
+                            : Icon(Icons.visibility_rounded),
+                      ),
+                      suffixIconColor: Colors.grey),
+                  obscureText: _hidePassword,
+                  onChanged: (value) {},
+                  validator: (value) {
+                    if (value == null || value.length < 8) {
+                      return 'Password must be at least 8 characters';
+                    }
+                    return null;
+                  },
+                ),
+                SizedBox(
+                  height: 10,
+                ),
+                Visibility(
+                  visible: loginMode,
+                  child: TextButton(
+                    key: const Key('Forgot'),
+                    style: ButtonStyle(alignment: Alignment.centerRight),
+                    onPressed: () {},
+                    child: Text(
+                      'Forgot Password?',
+                      style: TextStyle(
+                          color: isDark ? Colors.white : Colors.black),
+                    ),
                   ),
                 ),
-              )
-            ],
+                ElevatedButton(
+                  key: const Key('Login'),
+                  onPressed: _submitForm,
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xffdbba5e),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(5.0),
+                    ),
+                    padding: const EdgeInsets.all(20.0),
+                  ),
+                  child: Text(loginMode ? 'Log In' : 'Sing Up',
+                      style: TextStyle(color: Colors.black)),
+                ),
+                Padding(
+                  padding: const EdgeInsets.all(12.0),
+                  child: Center(
+                    child: GestureDetector(
+                      onTap: () {
+                        setState(() {
+                          loginMode = !loginMode;
+                        });
+                      },
+                      child: Text(loginMode
+                          ? 'Don\'t have an account? Register here'
+                          : 'Already registered? Login here'),
+                    ),
+                  ),
+                )
+              ],
+            ),
           ),
         ),
       ),
