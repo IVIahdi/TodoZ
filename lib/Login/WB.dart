@@ -5,7 +5,6 @@ import 'package:flutter/material.dart';
 import 'package:listify/Pages/HomePage.dart';
 import 'package:provider/provider.dart';
 import '../Providers/Theme_Provider.dart';
-import 'AuthService.dart';
 
 class WelcomeBack extends StatefulWidget {
   const WelcomeBack({super.key});
@@ -50,23 +49,20 @@ class _WelcomeBackState extends State<WelcomeBack> {
           email: emailController.text,
           password: passwordController.text,
         );
-
-        // Store additional user data in Firestore
         await FirebaseFirestore.instance
             .collection('users')
             .doc(_user.user!.uid)
-            .set({
-          'email': emailController.text,
-          'username': usernameController.text,
-        });
-
-        // Fetch the user data from Firestore
+            .set(
+          {
+            'email': emailController.text,
+            'username': usernameController.text,
+          },
+        );
         var userData = await FirebaseFirestore.instance
             .collection('users')
             .doc(_user.user!.uid)
             .get();
 
-        // Navigate to HomePage with the UserCredential and additional user data
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(
