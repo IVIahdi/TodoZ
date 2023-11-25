@@ -7,7 +7,7 @@ import '../Providers/Theme_Provider.dart';
 
 class HomePage extends StatefulWidget {
   final UserCredential user;
-  final Map<String, dynamic>? userData; // Add this line
+  final Map<String, dynamic>? userData;
 
   const HomePage({Key? key, required this.user, this.userData})
       : super(key: key);
@@ -29,7 +29,7 @@ class _HomePageState extends State<HomePage> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text('Home Page'),
+        title: Text('Welcome, ${widget.userData?['username'] ?? _user?.uid}!'),
         actions: [
           IconButton(
             icon: const Icon(Icons.brightness_4),
@@ -43,20 +43,12 @@ class _HomePageState extends State<HomePage> {
           ),
         ],
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
+      body: const Padding(
+        padding: EdgeInsets.all(16.0),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            Text(
-              'Welcome, ${widget.userData?['username'] ?? widget.user.user?.uid}!',
-              style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-            ),
-
-            SizedBox(height: 20),
-            // Add any additional content here
-          ],
+          children: [],
         ),
       ),
     );

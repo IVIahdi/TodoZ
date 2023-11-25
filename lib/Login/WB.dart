@@ -102,12 +102,10 @@ class _WelcomeBackState extends State<WelcomeBack> {
         _showErrorSnackbar('The email address is already registered.');
       } else {
         _showErrorSnackbar(
-            'Authentication failed (1). Please check your credentials.');
+            'Failed (User Side). Please check your credentials.');
       }
     } catch (e) {
-      // Handle other exceptions
-      _showErrorSnackbar(
-          'Authentication failed (2). Please check your credentials.');
+      _showErrorSnackbar('Failed (Server Side).');
     }
   }
 
