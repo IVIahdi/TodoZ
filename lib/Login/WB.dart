@@ -45,35 +45,36 @@ class _WelcomeBackState extends State<WelcomeBack> {
   void _submitForm() async {
     try {
       if (!loginMode && _validateForm()) {
-        var _user = await _auth.createUserWithEmailAndPassword(
+        var user = await _auth.createUserWithEmailAndPassword(
           email: emailController.text,
           password: passwordController.text,
         );
         await FirebaseFirestore.instance
             .collection('users')
-            .doc(_user.user!.uid)
+            .doc(user.user!.uid)
             .set(
           {
             'email': emailController.text,
             'username': usernameController.text,
+            'todos': []
           },
         );
         var userData = await FirebaseFirestore.instance
             .collection('users')
-            .doc(_user.user!.uid)
+            .doc(user.user!.uid)
             .get();
 
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(
             builder: (context) => HomePage(
-              user: _user,
+              user: user,
               userData: userData.data(),
             ),
           ),
         );
       } else if (loginMode && _validateForm()) {
-        var _user = await _auth.signInWithEmailAndPassword(
+        var user = await _auth.signInWithEmailAndPassword(
           email: emailController.text,
           password: passwordController.text,
         );
@@ -81,7 +82,7 @@ class _WelcomeBackState extends State<WelcomeBack> {
         // Fetch the user data from Firestore
         var userData = await FirebaseFirestore.instance
             .collection('users')
-            .doc(_user.user!.uid)
+            .doc(user.user!.uid)
             .get();
 
         // Navigate to HomePage with the UserCredential and additional user data
@@ -89,7 +90,7 @@ class _WelcomeBackState extends State<WelcomeBack> {
           context,
           MaterialPageRoute(
             builder: (context) => HomePage(
-              user: _user,
+              user: user,
               userData: userData.data(),
             ),
           ),
