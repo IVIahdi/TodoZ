@@ -25,6 +25,14 @@ class _HomePageState extends State<HomePage> {
         context, MaterialPageRoute(builder: (context) => const WelcomeBack()));
   }
 
+  getAllUsersTodos() async {
+    final _usersData = await FirebaseFirestore.instance
+        .collection('users')
+        .get()
+        .then((value) => value.docs.map((e) => e.data()['todos']));
+    return _usersData;
+  }
+
   Future<void> _addTodo() async {
     final String newTodo = _newTodoController.text.trim();
     if (newTodo.isNotEmpty) {
@@ -65,22 +73,21 @@ class _HomePageState extends State<HomePage> {
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             Expanded(
-              child: StreamBuilder<DocumentSnapshot>(
+              child: StreamBuilder<QuerySnapshot>(
                 stream: FirebaseFirestore.instance
-                    .collection('users')
-                    .doc(widget.user.user!.uid)
+                    .collectionGroup('users')
                     .snapshots(),
                 builder: (context, snapshot) {
                   if (snapshot.hasData) {
-                    final userData =
-                        snapshot.data!.data() as Map<String, dynamic>;
-                    final todos = userData['todos'] ?? [];
+                    final todos =
+                        snapshot.data!.docs.map((doc) => doc['todos']).toList();
                     return ListView.builder(
                       itemCount: todos.length,
                       itemBuilder: (context, index) {
+                        final doc = snapshot.data!.docs[index];
                         return ListTile(
-                          title: Text(todos[index]),
-                          subtitle: Text('By: ${userData['username']}'),
+                          title: Text('${todos[index]}'),
+                          subtitle: Text('By: ${doc['username']}'),
                         );
                       },
                     );
