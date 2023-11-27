@@ -111,10 +111,7 @@ class _WelcomeBackState extends State<WelcomeBack> {
   }
 
   void toggleEye() {
-    setState(
-      () {
-        _hidePassword = !_hidePassword;
-      },
+    setState(() {_hidePassword = !_hidePassword;},
     );
   }
 
@@ -143,7 +140,7 @@ class _WelcomeBackState extends State<WelcomeBack> {
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 Text(
-                  'Welcome Back!',
+                    loginMode ? 'Welcome Back!' : 'Hello New Friend!',
                   style: TextStyle(
                     fontSize: 30,
                     fontWeight: FontWeight.bold,

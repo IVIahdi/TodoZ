@@ -51,71 +51,84 @@ class _HomePageState extends State<HomePage> {
     final user = widget.user.user;
 
     return Scaffold(
-      appBar: AppBar(
-        title: Text('Welcome, ${widget.userData?['username'] ?? user?.uid}!'),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.brightness_4),
-            onPressed: () {
-              Provider.of<ThemeProvider>(context, listen: false).toggleTheme();
-            },
+      body: CustomScrollView(
+        slivers: [
+          SliverAppBar(
+            title:
+                Text('Welcome, ${widget.userData?['username'] ?? user?.uid}!'),
+            actions: [
+              IconButton(
+                icon: const Icon(Icons.brightness_4),
+                onPressed: () {
+                  Provider.of<ThemeProvider>(context, listen: false)
+                      .toggleTheme();
+                },
+              ),
+              IconButton(
+                icon: const Icon(Icons.logout),
+                onPressed: _logout,
+              ),
+            ],
           ),
-          IconButton(
-            icon: const Icon(Icons.logout),
-            onPressed: _logout,
+          //
+          SliverPadding(
+            padding: const EdgeInsets.all(16.0),
+            sliver: SliverList(
+              delegate: SliverChildBuilderDelegate(
+                (context, index) {
+                  return StreamBuilder<QuerySnapshot>(
+                    stream: FirebaseFirestore.instance
+                        .collectionGroup('users')
+                        .snapshots(),
+                    builder: (context, snapshot) {
+                      if (snapshot.hasData) {
+                        final todos = snapshot.data!.docs
+                            .map((doc) => doc['todos'])
+                            .toList();
+                        return Column(
+                          children: todos.map((todo) {
+                            final doc =
+                                snapshot.data!.docs[todos.indexOf(todo)];
+                            return ListTile(
+                              title: Text('$todo'),
+                              subtitle: Text('By: ${doc['username']}'),
+                            );
+                          }).toList(),
+                        );
+                      } else {
+                        return const Center(
+                          child: CircularProgressIndicator(),
+                        );
+                      }
+                    },
+                  );
+                },
+                childCount: 1,
+              ),
+            ),
+          ),
+
+          SliverToBoxAdapter(
+            child: const SizedBox(height: 10),
           ),
         ],
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.start,
-          crossAxisAlignment: CrossAxisAlignment.stretch,
+      bottomNavigationBar: Padding(
+        padding: EdgeInsets.all(16.0),
+        child: Row(
           children: [
             Expanded(
-              child: StreamBuilder<QuerySnapshot>(
-                stream: FirebaseFirestore.instance
-                    .collectionGroup('users')
-                    .snapshots(),
-                builder: (context, snapshot) {
-                  if (snapshot.hasData) {
-                    final todos =
-                        snapshot.data!.docs.map((doc) => doc['todos']).toList();
-                    return ListView.builder(
-                      itemCount: todos.length,
-                      itemBuilder: (context, index) {
-                        final doc = snapshot.data!.docs[index];
-                        return ListTile(
-                          title: Text('${todos[index]}'),
-                          subtitle: Text('By: ${doc['username']}'),
-                        );
-                      },
-                    );
-                  } else {
-                    return const Center(
-                      child: CircularProgressIndicator(),
-                    );
-                  }
-                },
+              child: TextField(
+                controller: _newTodoController,
+                decoration: InputDecoration(
+                  hintText: 'Add a new todo',
+                ),
               ),
             ),
-            const SizedBox(height: 10),
-            Row(
-              children: [
-                Expanded(
-                  child: TextField(
-                    controller: _newTodoController,
-                    decoration: InputDecoration(
-                      hintText: 'Add a new todo',
-                    ),
-                  ),
-                ),
-                const SizedBox(width: 10),
-                ElevatedButton(
-                  onPressed: _addTodo,
-                  child: Text('Add Todo'),
-                ),
-              ],
+            const SizedBox(width: 10),
+            ElevatedButton(
+              onPressed: _addTodo,
+              child: Text('Add Todo'),
             ),
           ],
         ),
