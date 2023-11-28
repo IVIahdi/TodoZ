@@ -1,3 +1,4 @@
+// ignore_for_file: prefer_const_constructors
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -54,8 +55,6 @@ class _HomePageState extends State<HomePage> {
       body: CustomScrollView(
         slivers: [
           SliverAppBar(
-            title:
-                Text('Welcome, ${widget.userData?['username'] ?? user?.uid}!'),
             actions: [
               IconButton(
                 icon: const Icon(Icons.brightness_4),
@@ -69,6 +68,22 @@ class _HomePageState extends State<HomePage> {
                 onPressed: _logout,
               ),
             ],
+            expandedHeight: 250,
+            stretch: true,
+            onStretchTrigger: () async {},
+            flexibleSpace: FlexibleSpaceBar(
+              background: Image.network(
+                  'https://faculty.kfupm.edu.sa/CE/nratrout/Images/Title.jpg',
+                  fit: BoxFit.fill),
+              title: Text(
+                  'Welcome, ${widget.userData?['username'] ?? user?.uid}!'),
+              centerTitle: true,
+              stretchModes: [
+                StretchMode.fadeTitle,
+                StretchMode.zoomBackground,
+                StretchMode.blurBackground
+              ],
+            ),
           ),
           //
           SliverPadding(
@@ -86,14 +101,24 @@ class _HomePageState extends State<HomePage> {
                             .map((doc) => doc['todos'])
                             .toList();
                         return Column(
-                          children: todos.map((todo) {
-                            final doc =
-                                snapshot.data!.docs[todos.indexOf(todo)];
-                            return ListTile(
-                              title: Text('$todo'),
-                              subtitle: Text('By: ${doc['username']}'),
-                            );
-                          }).toList(),
+                          children: [
+                            for (var todo in todos)
+                              for (var item in todo)
+                                ListTile(
+                                  leading: IconButton(
+                                    onPressed: () {},
+                                    icon: Icon(Icons.circle_outlined),
+                                  ),
+                                  trailing: IconButton(
+                                    icon: Icon(Icons.delete),
+                                    onPressed: () {},
+                                    color: Colors.red,
+                                  ),
+                                  title: Text('$item'),
+                                  subtitle: Text(
+                                      'By: ${snapshot.data!.docs[todos.indexOf(todo)]['username']}'),
+                                )
+                          ],
                         );
                       } else {
                         return const Center(
