@@ -48,6 +48,37 @@ class _HomePageState extends State<HomePage> {
     }
   }
 
+  Future<void> _deleteTodo(String userId, String todo) async {
+    try {
+      if (widget.user.user?.uid == userId) {
+        // I am still Here (Not finished)
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            backgroundColor: Colors.lightGreen,
+            content: Text('Todo deleted successfully'),
+            duration: Duration(seconds: 3),
+          ),
+        );
+        await FirebaseFirestore.instance
+            .collection('users')
+            .doc(userId)
+            .update({
+          'todos': FieldValue.arrayRemove([todo]),
+        });
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            backgroundColor: Colors.lightGreen,
+            content: Text('You are not the owner'),
+            duration: Duration(seconds: 3),
+          ),
+        );
+      }
+    } catch (error) {
+      print('Error deleting todo: $error');
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final user = widget.user.user;
@@ -115,7 +146,12 @@ class _HomePageState extends State<HomePage> {
                                   padding: const EdgeInsets.only(bottom: 8),
                                   child: ListTile(
                                     leading: IconButton(
-                                      onPressed: () {},
+                                      onPressed: () {
+                                        _deleteTodo(
+                                          user!.uid,
+                                          item, // Use 'item' directly as the identifier
+                                        );
+                                      },
                                       icon: Icon(Icons.circle_outlined),
                                     ),
                                     title: Text('$item'),
