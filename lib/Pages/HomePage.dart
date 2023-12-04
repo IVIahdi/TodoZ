@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../Login/WB.dart';
 import '../Providers/Theme_Provider.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 
 class HomePage extends StatefulWidget {
   final UserCredential user;
@@ -68,13 +69,19 @@ class _HomePageState extends State<HomePage> {
                 onPressed: _logout,
               ),
             ],
-            expandedHeight: 250,
+            expandedHeight: 150,
             stretch: true,
+            centerTitle: true,
             onStretchTrigger: () async {},
             flexibleSpace: FlexibleSpaceBar(
-              background: Image.network(
-                  'https://faculty.kfupm.edu.sa/CE/nratrout/Images/Title.jpg',
-                  fit: BoxFit.fill),
+              background: CachedNetworkImage(
+                imageUrl:
+                    'https://faculty.kfupm.edu.sa/CE/nratrout/Images/Title.jpg',
+                progressIndicatorBuilder: (context, url, downloadProgress) =>
+                    CircularProgressIndicator(value: downloadProgress.progress),
+                errorWidget: (context, url, error) => Icon(Icons.error),
+                fit: BoxFit.fill,
+              ),
               title: Text(
                   'Welcome, ${widget.userData?['username'] ?? user?.uid}!'),
               centerTitle: true,
@@ -104,19 +111,28 @@ class _HomePageState extends State<HomePage> {
                           children: [
                             for (var todo in todos)
                               for (var item in todo)
-                                ListTile(
-                                  leading: IconButton(
-                                    onPressed: () {},
-                                    icon: Icon(Icons.circle_outlined),
+                                Padding(
+                                  padding: const EdgeInsets.only(bottom: 8),
+                                  child: ListTile(
+                                    leading: IconButton(
+                                      onPressed: () {},
+                                      icon: Icon(Icons.circle_outlined),
+                                    ),
+                                    title: Text('$item'),
+                                    subtitle: Text(
+                                      'By: ${snapshot.data!.docs[todos.indexOf(todo)]['username']}',
+                                    ),
+                                    // Optional: Set a background color for the ListTile
+                                    contentPadding: EdgeInsets.all(
+                                        8), // Optional: Add padding to the content
+                                    shape: RoundedRectangleBorder(
+                                      // Apply rounded rectangle border
+                                      borderRadius: BorderRadius.circular(8),
+                                      side: BorderSide(
+                                          color: Colors.grey,
+                                          width: 1), // Border color and width
+                                    ),
                                   ),
-                                  trailing: IconButton(
-                                    icon: Icon(Icons.delete),
-                                    onPressed: () {},
-                                    color: Colors.red,
-                                  ),
-                                  title: Text('$item'),
-                                  subtitle: Text(
-                                      'By: ${snapshot.data!.docs[todos.indexOf(todo)]['username']}'),
                                 )
                           ],
                         );
@@ -138,25 +154,38 @@ class _HomePageState extends State<HomePage> {
           ),
         ],
       ),
-      bottomNavigationBar: Padding(
-        padding: EdgeInsets.all(16.0),
-        child: Row(
-          children: [
-            Expanded(
-              child: TextField(
+      floatingActionButton: FloatingActionButton(
+        mini: true,
+        onPressed: () {
+          showDialog(
+            context: context,
+            builder: (context) => AlertDialog(
+              title: Text('Add a new ToDo'),
+              content: TextField(
                 controller: _newTodoController,
                 decoration: InputDecoration(
-                  hintText: 'Add a new todo',
+                  hintText: 'Enter your ToDo',
                 ),
               ),
+              actions: [
+                TextButton(
+                  onPressed: () {
+                    Navigator.pop(context);
+                  },
+                  child: Text('Cancel'),
+                ),
+                ElevatedButton(
+                  onPressed: () {
+                    _addTodo();
+                    Navigator.pop(context);
+                  },
+                  child: Text('Add ToDo'),
+                ),
+              ],
             ),
-            const SizedBox(width: 10),
-            ElevatedButton(
-              onPressed: _addTodo,
-              child: Text('Add Todo'),
-            ),
-          ],
-        ),
+          );
+        },
+        child: Icon(Icons.add),
       ),
     );
   }
