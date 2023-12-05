@@ -68,7 +68,7 @@ class _HomePageState extends State<HomePage> {
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            backgroundColor: Colors.lightGreen,
+            backgroundColor: Colors.redAccent,
             content: Text('You are not the owner'),
             duration: Duration(seconds: 3),
           ),
@@ -131,24 +131,24 @@ class _HomePageState extends State<HomePage> {
                 (context, index) {
                   return StreamBuilder<QuerySnapshot>(
                     stream: FirebaseFirestore.instance
-                        .collectionGroup('users')
+                        .collection('users')
                         .snapshots(),
                     builder: (context, snapshot) {
                       if (snapshot.hasData) {
-                        final todos = snapshot.data!.docs
-                            .map((doc) => doc['todos'])
-                            .toList();
+                        final users = snapshot.data!.docs;
+
                         return Column(
                           children: [
-                            for (var todo in todos)
-                              for (var item in todo)
+                            for (var userDoc in users)
+                              for (var item in userDoc['todos'])
                                 Padding(
                                   padding: const EdgeInsets.only(bottom: 8),
                                   child: ListTile(
                                     leading: IconButton(
                                       onPressed: () {
                                         _deleteTodo(
-                                          user!.uid,
+                                          userDoc
+                                              .id, // Retrieve the UID using id property
                                           item, // Use 'item' directly as the identifier
                                         );
                                       },
@@ -156,9 +156,8 @@ class _HomePageState extends State<HomePage> {
                                     ),
                                     title: Text('$item'),
                                     subtitle: Text(
-                                      'By: ${snapshot.data!.docs[todos.indexOf(todo)]['username']}',
+                                      'By: ${userDoc['username']}',
                                     ),
-                                    // Optional: Set a background color for the ListTile
                                     contentPadding: EdgeInsets.all(
                                         8), // Optional: Add padding to the content
                                     shape: RoundedRectangleBorder(
@@ -169,13 +168,11 @@ class _HomePageState extends State<HomePage> {
                                           width: 1), // Border color and width
                                     ),
                                   ),
-                                )
+                                ),
                           ],
                         );
                       } else {
-                        return const Center(
-                          child: CircularProgressIndicator(),
-                        );
+                        return CircularProgressIndicator(); // or any other loading indicator
                       }
                     },
                   );
