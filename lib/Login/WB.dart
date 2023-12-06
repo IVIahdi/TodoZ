@@ -111,7 +111,10 @@ class _WelcomeBackState extends State<WelcomeBack> {
   }
 
   void toggleEye() {
-    setState(() {_hidePassword = !_hidePassword;},
+    setState(
+      () {
+        _hidePassword = !_hidePassword;
+      },
     );
   }
 
@@ -130,8 +133,9 @@ class _WelcomeBackState extends State<WelcomeBack> {
           ),
         ],
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
+      body: Container(
+        margin: EdgeInsets.all(15),
+        alignment: Alignment.center,
         child: Form(
           key: formkey,
           child: SingleChildScrollView(
@@ -140,7 +144,7 @@ class _WelcomeBackState extends State<WelcomeBack> {
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 Text(
-                    loginMode ? 'Welcome Back!' : 'Hello New Friend!',
+                  loginMode ? 'Welcome Back!' : 'Hello New Friend!',
                   style: TextStyle(
                     fontSize: 30,
                     fontWeight: FontWeight.bold,
