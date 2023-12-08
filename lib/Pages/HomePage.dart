@@ -7,6 +7,7 @@ import '../Login/WB.dart';
 import '../Providers/Theme_Provider.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 
+import 'DrawerWdiget.dart';
 class HomePage extends StatefulWidget {
   final UserCredential user;
   final Map<String, dynamic>? userData;
@@ -84,6 +85,7 @@ class _HomePageState extends State<HomePage> {
     final user = widget.user.user;
 
     return Scaffold(
+      drawer: MyDrawerWidget(userData: widget.userData),
       body: CustomScrollView(
         slivers: [
           SliverAppBar(
