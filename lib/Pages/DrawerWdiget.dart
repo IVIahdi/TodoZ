@@ -3,8 +3,9 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 
 class MyDrawerWidget extends StatefulWidget {
   final  userData;
-
-  MyDrawerWidget({required this.userData});
+  final Function onProjectSelected;
+  final String currentProjectName;
+  MyDrawerWidget({required this.userData,required this.onProjectSelected,required this.currentProjectName});
 
   @override
   _MyDrawerWidgetState createState() => _MyDrawerWidgetState();
@@ -33,7 +34,8 @@ class _MyDrawerWidgetState extends State<MyDrawerWidget> {
         // Add the new project to the Firebase collection
         await projectsCollection.add(newProject);
 
-        // Refresh the list of projects
+                             widget.onProjectSelected(_newProjectController.text.trim());
+ Navigator.pop(context);
 
       } else {
         // Show an error message or handle the case where the project name is empty
@@ -59,6 +61,10 @@ for (QueryDocumentSnapshot<Object?> document in querySnapshot.docs) {
   
   projects.add(document.data() as Map<String, dynamic>? ?? {});
 }
+
+
+
+
       return projects;
     } catch (e) {
       print("Error fetching projects: $e");
@@ -169,6 +175,7 @@ for (QueryDocumentSnapshot<Object?> document in querySnapshot.docs) {
       });
     });
                     Navigator.pop(context);
+
                   },
                   child: Text('create New Project'),
                 ),
@@ -177,6 +184,8 @@ for (QueryDocumentSnapshot<Object?> document in querySnapshot.docs) {
           );
             },
           ),
+
+
 ListView.builder(
   shrinkWrap: true,
   itemCount: projects.length,
@@ -184,17 +193,21 @@ ListView.builder(
     return ListTile(
       title: Text(projects[index]['projectName'] ?? 'No Name'),
       onTap: () {
+ widget.onProjectSelected(projects[index]['projectName']);
+ Navigator.pop(context);
       },
-      trailing: IconButton(
-        icon: Icon(Icons.delete, color: Colors.red),
-        onPressed: () {
-          _deleteProject(projects[index]['projectName']);
-          setState(() {
-            projects.removeAt(index);
-          });
-        },
-      )
-    );
+      trailing: (projects[index]['projectName'] == 'Main Project' || projects[index]['projectName'] == widget.currentProjectName)
+          ? null
+          : IconButton(
+              icon: Icon(Icons.delete, color: Colors.red),
+              onPressed: () {
+                _deleteProject(projects[index]['projectName']);
+                setState(() {
+                  projects.removeAt(index);
+                });
+              },
+            )
+);
   },
 ),
 
