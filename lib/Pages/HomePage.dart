@@ -6,6 +6,7 @@ import 'package:provider/provider.dart';
 import '../Login/WB.dart';
 import '../Providers/Theme_Provider.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+import '../Providers/projects.dart';
 
 import 'DrawerWdiget.dart';
 class HomePage extends StatefulWidget {
@@ -21,6 +22,26 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   final TextEditingController _newTodoController = TextEditingController();
+
+
+Future<void> addProject(String projectName, [List<Task> tasksList = const []]) async {
+  CollectionReference projects = FirebaseFirestore.instance.collection('projects');
+  await projects.add({
+    'projectName': projectName,
+    'tasksList': tasksList.map((task) => {
+      'creatorName': task.creatorName,
+      'taskName': task.taskName,
+    }).toList(),
+  });
+}
+
+
+
+
+
+
+
+
 
   void _logout() async {
     await FirebaseAuth.instance.signOut();
@@ -192,6 +213,11 @@ class _HomePageState extends State<HomePage> {
       floatingActionButton: FloatingActionButton(
         mini: true,
         onPressed: () {
+
+print('asem');
+
+
+          
           showDialog(
             context: context,
             builder: (context) => AlertDialog(
