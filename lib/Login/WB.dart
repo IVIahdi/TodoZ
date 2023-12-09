@@ -44,20 +44,23 @@ class _WelcomeBackState extends State<WelcomeBack> {
 
   void _submitForm() async {
     try {
+      showDialog(
+          context: context,
+          builder: (context) {
+            return Center(child: CircularProgressIndicator());
+          });
+
       if (!loginMode && _validateForm()) {
         var user = await _auth.createUserWithEmailAndPassword(
           email: emailController.text,
           password: passwordController.text,
         );
+
         await FirebaseFirestore.instance
             .collection('users')
             .doc(user.user!.uid)
             .set(
-          {
-            'email': emailController.text,
-            'username': usernameController.text,
-            'todos': []
-          },
+          {'email': emailController.text, 'username': usernameController.text},
         );
         var userData = await FirebaseFirestore.instance
             .collection('users')
@@ -98,14 +101,19 @@ class _WelcomeBackState extends State<WelcomeBack> {
       } else {
         throw Exception('Invalid form data');
       }
+      emailController.clear();
+      passwordController.clear();
     } on FirebaseAuthException catch (e) {
+      Navigator.of(context).pop();
       if (e.code == 'email-already-in-use') {
         _showErrorSnackbar('The email address is already registered.');
       } else {
         _showErrorSnackbar(
             'Failed (User Side). Please check your credentials.');
       }
+      passwordController.clear();
     } catch (e) {
+      Navigator.of(context).pop();
       _showErrorSnackbar('Failed (Server Side).');
     }
   }
@@ -162,6 +170,11 @@ class _WelcomeBackState extends State<WelcomeBack> {
                       icon: Icon(Icons.person),
                       labelText: 'Username',
                     ),
+                    validator: (value) {
+                      if (value == null || value.length < 3) {
+                        return 'your username must be more than 3 characters';
+                      }
+                    },
                   ),
                 ),
                 TextFormField(
