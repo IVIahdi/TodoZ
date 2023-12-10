@@ -193,7 +193,9 @@ class _HomePageState extends State<HomePage> {
                 imageUrl:
                     'https://faculty.kfupm.edu.sa/CE/nratrout/Images/Title.jpg',
                 progressIndicatorBuilder: (context, url, downloadProgress) =>
-                    CircularProgressIndicator(value: downloadProgress.progress),
+                    Center(
+                        child: CircularProgressIndicator(
+                            value: downloadProgress.progress)),
                 errorWidget: (context, url, error) => Icon(Icons.error),
                 fit: BoxFit.fill,
               ),
