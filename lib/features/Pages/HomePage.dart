@@ -46,27 +46,6 @@ class _HomePageState extends State<HomePage> {
         context, MaterialPageRoute(builder: (context) => const WelcomeBack()));
   }
 
-  getAllUsersTodos() async {
-    final _usersData = await FirebaseFirestore.instance
-        .collection('users')
-        .get()
-        .then((value) => value.docs.map((e) => e.data()['todos']));
-    return _usersData;
-  }
-
-  Future<void> _addTodo() async {
-    final String newTodo = _newTodoController.text.trim();
-    if (newTodo.isNotEmpty) {
-      await FirebaseFirestore.instance
-          .collection('users')
-          .doc(widget.user.user!.uid)
-          .update({
-        'todos': FieldValue.arrayUnion([newTodo]),
-      });
-      _newTodoController.clear();
-    }
-  }
-
   Future<void> _addTodoToProject() async {
     final String newTodo = _newTodoController.text.trim();
     if (newTodo.isNotEmpty) {
@@ -201,7 +180,7 @@ class _HomePageState extends State<HomePage> {
               ),
               title: Text(projectCurrentName),
               centerTitle: true,
-              stretchModes: [
+              stretchModes: const [
                 StretchMode.fadeTitle,
                 StretchMode.zoomBackground,
                 StretchMode.blurBackground
@@ -252,8 +231,8 @@ class _HomePageState extends State<HomePage> {
                                   subtitle: Text(
                                     'By: ${item['creatorName']}',
                                   ),
-                                  contentPadding: EdgeInsets.all(
-                                      8), // Optional: Add padding to the content
+                                  contentPadding: EdgeInsets.all(8),
+                                  // Optional: Add padding to the content
                                   shape: RoundedRectangleBorder(
                                     // Apply rounded rectangle border
                                     borderRadius: BorderRadius.circular(8),
@@ -284,8 +263,6 @@ class _HomePageState extends State<HomePage> {
       floatingActionButton: FloatingActionButton(
         mini: true,
         onPressed: () {
-          print('asem');
-
           showDialog(
             context: context,
             builder: (context) => AlertDialog(
