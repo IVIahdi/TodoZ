@@ -2,10 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class MyDrawerWidget extends StatefulWidget {
-  final  userData;
+  final userData;
   final Function onProjectSelected;
   final String currentProjectName;
-  MyDrawerWidget({required this.userData,required this.onProjectSelected,required this.currentProjectName});
+
+  MyDrawerWidget(
+      {required this.userData,
+      required this.onProjectSelected,
+      required this.currentProjectName});
 
   @override
   _MyDrawerWidgetState createState() => _MyDrawerWidgetState();
@@ -13,7 +17,6 @@ class MyDrawerWidget extends StatefulWidget {
 
 class _MyDrawerWidgetState extends State<MyDrawerWidget> {
   final TextEditingController _newProjectController = TextEditingController();
-
 
   Future<void> _addProject() async {
     try {
@@ -34,9 +37,8 @@ class _MyDrawerWidgetState extends State<MyDrawerWidget> {
         // Add the new project to the Firebase collection
         await projectsCollection.add(newProject);
 
-                             widget.onProjectSelected(_newProjectController.text.trim());
- Navigator.pop(context);
-
+        widget.onProjectSelected(_newProjectController.text.trim());
+        Navigator.pop(context);
       } else {
         // Show an error message or handle the case where the project name is empty
         print('Error: Project name cannot be empty');
@@ -47,23 +49,19 @@ class _MyDrawerWidgetState extends State<MyDrawerWidget> {
     }
   }
 
- List<Map<String, dynamic>> projects=[];
-
+  List<Map<String, dynamic>> projects = [];
 
   Future<List<Map<String, dynamic>>> getAllProjects() async {
-    final CollectionReference projectsCollection = FirebaseFirestore.instance.collection('projects');
+    final CollectionReference projectsCollection =
+        FirebaseFirestore.instance.collection('projects');
     try {
-QuerySnapshot<Object?> querySnapshot = await projectsCollection.get();
+      QuerySnapshot<Object?> querySnapshot = await projectsCollection.get();
 
-List<Map<String, dynamic>> projects = [];
+      List<Map<String, dynamic>> projects = [];
 
-for (QueryDocumentSnapshot<Object?> document in querySnapshot.docs) {
-  
-  projects.add(document.data() as Map<String, dynamic>? ?? {});
-}
-
-
-
+      for (QueryDocumentSnapshot<Object?> document in querySnapshot.docs) {
+        projects.add(document.data() as Map<String, dynamic>? ?? {});
+      }
 
       return projects;
     } catch (e) {
@@ -72,12 +70,13 @@ for (QueryDocumentSnapshot<Object?> document in querySnapshot.docs) {
     }
   }
 
-
-
   Future<void> _deleteProject(String projectName) async {
     try {
-      final CollectionReference projectsCollection = FirebaseFirestore.instance.collection('projects');
-      QuerySnapshot<Object?> querySnapshot = await projectsCollection.where('projectName', isEqualTo: projectName).get();
+      final CollectionReference projectsCollection =
+          FirebaseFirestore.instance.collection('projects');
+      QuerySnapshot<Object?> querySnapshot = await projectsCollection
+          .where('projectName', isEqualTo: projectName)
+          .get();
       if (querySnapshot.docs.isNotEmpty) {
         await projectsCollection.doc(querySnapshot.docs.first.id).delete();
       } else {
@@ -87,11 +86,6 @@ for (QueryDocumentSnapshot<Object?> document in querySnapshot.docs) {
       print("Error deleting project: $e");
     }
   }
-
-
-
-
-
 
   @override
   void initState() {
@@ -103,8 +97,7 @@ for (QueryDocumentSnapshot<Object?> document in querySnapshot.docs) {
     });
   }
 
-
-@override
+  @override
   Widget build(BuildContext context) {
     return Drawer(
       child: ListView(
@@ -147,71 +140,65 @@ for (QueryDocumentSnapshot<Object?> document in querySnapshot.docs) {
               ),
             ),
             onTap: () {
-
-
-          showDialog(
-            context: context,
-            builder: (context) => AlertDialog(
-              title: Text('Add a new Project'),
-              content: TextField(
-                controller: _newProjectController,
-                decoration: InputDecoration(
-                  hintText: 'Enter your Project Name',
+              showDialog(
+                context: context,
+                builder: (context) => AlertDialog(
+                  title: Text('Add a new Project'),
+                  content: TextField(
+                    controller: _newProjectController,
+                    decoration: InputDecoration(
+                      hintText: 'Enter your Project Name',
+                    ),
+                  ),
+                  actions: [
+                    TextButton(
+                      onPressed: () {
+                        Navigator.pop(context);
+                      },
+                      child: Text('Cancel'),
+                    ),
+                    ElevatedButton(
+                      onPressed: () {
+                        _addProject();
+                        getAllProjects().then((value) {
+                          setState(() {
+                            projects = value;
+                          });
+                        });
+                        Navigator.pop(context);
+                      },
+                      child: Text('create New Project'),
+                    ),
+                  ],
                 ),
-              ),
-              actions: [
-                TextButton(
-                  onPressed: () {
-                    Navigator.pop(context);
-                  },
-                  child: Text('Cancel'),
-                ),
-                ElevatedButton(
-                  onPressed: () {
-                    _addProject();
-                     getAllProjects().then((value) {
-      setState(() {
-        projects = value;
-      });
-    });
-                    Navigator.pop(context);
-
-                  },
-                  child: Text('create New Project'),
-                ),
-              ],
-            ),
-          );
+              );
             },
           ),
-
-
-ListView.builder(
-  shrinkWrap: true,
-  itemCount: projects.length,
-  itemBuilder: (context, index) {
-    return ListTile(
-      title: Text(projects[index]['projectName'] ?? 'No Name'),
-      onTap: () {
- widget.onProjectSelected(projects[index]['projectName']);
- Navigator.pop(context);
-      },
-      trailing: (projects[index]['projectName'] == 'Main Project' || projects[index]['projectName'] == widget.currentProjectName)
-          ? null
-          : IconButton(
-              icon: Icon(Icons.delete, color: Colors.red),
-              onPressed: () {
-                _deleteProject(projects[index]['projectName']);
-                setState(() {
-                  projects.removeAt(index);
-                });
-              },
-            )
-);
-  },
-),
-
-
+          ListView.builder(
+            shrinkWrap: true,
+            itemCount: projects.length,
+            itemBuilder: (context, index) {
+              return ListTile(
+                  title: Text(projects[index]['projectName'] ?? 'No Name'),
+                  onTap: () {
+                    widget.onProjectSelected(projects[index]['projectName']);
+                    Navigator.pop(context);
+                  },
+                  trailing: (projects[index]['projectName'] == 'Main Project' ||
+                          projects[index]['projectName'] ==
+                              widget.currentProjectName)
+                      ? null
+                      : IconButton(
+                          icon: Icon(Icons.delete, color: Colors.red),
+                          onPressed: () {
+                            _deleteProject(projects[index]['projectName']);
+                            setState(() {
+                              projects.removeAt(index);
+                            });
+                          },
+                        ));
+            },
+          ),
         ],
       ),
     );

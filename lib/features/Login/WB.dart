@@ -131,7 +131,7 @@ class _WelcomeBackState extends State<WelcomeBack> {
     bool isDark = Provider.of<ThemeProvider>(context, listen: true).isDarkMode;
     return Scaffold(
       appBar: AppBar(
-        title: Text('IVI'),
+        title: Text('TodoZ'),
         actions: [
           IconButton(
             icon: const Icon(Icons.brightness_4),
