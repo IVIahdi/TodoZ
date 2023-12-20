@@ -10,7 +10,8 @@ efficiently.
 3. [Project Structure](#project-structure)
 4. [Getting Started](#getting-started)
 5. [Sensitive data](#sensitive-data)
-6. [Contributing](#contributing)
+6. [Test Files](#Tests)
+7. [Contributing](#contributing)
 
 ## Introduction
 
@@ -64,6 +65,9 @@ file
 
 Mahdi Alabbadi -> Owner of the firebase credentials
 Asem Kharma -> Main editor
+
+## Tests
+In test folder, a series of test cases and imports for our Todoz. It includes tests for various widgets, as well as integration tests for the complete app flow and user authentication. Additionally, the code contains mock classes for simulating user authentication and data.
 
 ## contributing
 
