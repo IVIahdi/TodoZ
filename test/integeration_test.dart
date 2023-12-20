@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:listify/features/Pages/HomePage.dart';
-import 'package:listify/features/main.dart' as app;
+import 'package:listify/src/presentation/HomePage.dart';
+import 'package:listify/src/presentation/main.dart' as app;
 
 void main() {
   testWidgets('Complete App Flow Test', (WidgetTester tester) async {
