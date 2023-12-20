@@ -2,9 +2,9 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:listify/features/Pages/HomePage.dart';
+import 'package:listify/src/presentation/HomePage.dart';
 import 'package:provider/provider.dart';
-import '../Providers/Theme_Provider.dart';
+import '../application/Theme_Provider.dart';
 
 class WelcomeBack extends StatefulWidget {
   const WelcomeBack({super.key});

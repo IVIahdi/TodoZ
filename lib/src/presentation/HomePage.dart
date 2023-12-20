@@ -3,10 +3,10 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import '../Login/WB.dart';
-import '../Providers/Theme_Provider.dart';
+import 'WB.dart';
+import '../application/Theme_Provider.dart';
 import 'package:cached_network_image/cached_network_image.dart';
-import '../Providers/projects.dart';
+import '../data/projects.dart';
 
 import 'DrawerWdiget.dart';
 
