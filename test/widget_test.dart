@@ -2,12 +2,12 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:listify/features/Login/WB.dart';
-import 'package:listify/features/Pages/DrawerWdiget.dart';
-import 'package:listify/features/Pages/HomePage.dart';
-import 'package:listify/features/Pages/WaitScreen.dart';
-import 'package:listify/features/Providers/Theme_Provider.dart';
-import 'package:listify/features/main.dart';
+import 'package:listify/src/presentation/WB.dart';
+import 'package:listify/src/presentation/DrawerWdiget.dart';
+import 'package:listify/src/presentation/HomePage.dart';
+import 'package:listify/src/presentation/WaitScreen.dart';
+import 'package:listify/src/application/Theme_Provider.dart';
+import 'package:listify/src/presentation/main.dart';
 import 'package:provider/provider.dart';
 
 void main() {
