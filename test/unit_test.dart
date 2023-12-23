@@ -1,11 +1,7 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:listify/src/application/AuthService.dart';
 import 'package:listify/src/application/Theme_Provider.dart';
 import 'package:listify/src/data/projects.dart';
-import 'package:mockito/mockito.dart';
 
 void main() {
   group('Project and Task Tests', () {
@@ -46,6 +42,3 @@ void main() {
     });
   });
 }
-
-
-

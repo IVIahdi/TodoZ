@@ -1,21 +1,13 @@
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:listify/src/presentation/WB.dart';
 import 'package:listify/src/presentation/DrawerWdiget.dart';
 import 'package:listify/src/presentation/HomePage.dart';
-import 'package:listify/src/presentation/WaitScreen.dart';
 import 'package:listify/src/application/Theme_Provider.dart';
-import 'package:listify/src/presentation/main.dart';
+import 'package:mockito/mockito.dart';
 import 'package:provider/provider.dart';
 
 void main() {
-  testWidgets('WaitPage Widget Test', (WidgetTester tester) async {
-    await tester.pumpWidget(const MaterialApp(home: WaitPage()));
-    expect(find.byType(Placeholder), findsOneWidget);
-  });
-
   testWidgets('HomePage Widget Test', (WidgetTester tester) async {
     final UserCredential mockUserCredential = MockUserCredential();
     final Map<String, dynamic> mockUserData = {
@@ -53,7 +45,7 @@ void main() {
     ));
 
     // Open the drawer
-    tester.fling(find.byType(AppBar), const Offset(-200.0, 0.0), 1000.0);
+    tester.fling(find.byType(SliverAppBar), const Offset(-200.0, 0.0), 1000.0);
     await tester.pumpAndSettle();
 
     // Verify that certain widgets are present
@@ -66,8 +58,14 @@ void main() {
 }
 
 // Mock class for UserCredential
-class MockUserCredential extends UserCredential {
-  MockUserCredential() : _authResultMock;
+class MockUser extends Mock implements User {}
+
+class MockUserCredential extends Mock implements UserCredential {
+  final MockUser _mockUser = MockUser();
+
+  MockUserCredential() {
+    when(this.user).thenReturn(_mockUser);
+  }
 }
 
 // Mock class for AuthResult

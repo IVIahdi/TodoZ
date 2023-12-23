@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:listify/src/presentation/HomePage.dart';
-import 'package:listify/src/presentation/main.dart' as app;
+import 'package:listify/main.dart' as app;
 
 void main() {
   testWidgets('Complete App Flow Test', (WidgetTester tester) async {
@@ -10,7 +10,8 @@ void main() {
   });
 
   group('WelcomeBack Integration Tests', () {
-    testWidgets('should login with valid credentials', (WidgetTester tester) async {
+    testWidgets('should login with valid credentials',
+        (WidgetTester tester) async {
       app.main();
       await tester.pumpAndSettle();
 
